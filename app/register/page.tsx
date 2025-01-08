@@ -1,12 +1,26 @@
 import React from "react";
 import { prisma } from "@/db";
+import { sha256 } from "js-sha256";
+import { redirect } from "next/navigation";
 
 const register = async (data: FormData) => {
   "use server";
+
   const username = data.get("username")?.valueOf();
-  if (typeof username !== "string" || username.length === 0) {
+  const password = data.get("password")?.valueOf();
+
+  if (typeof username !== "string") {
     throw new Error("Invalid username");
   }
+
+  if (typeof password !== "string") {
+    throw new Error("Invalid password");
+  }
+
+  if (username.length == 0 || password.length == 0) {
+    return;
+  }
+
   const user = await prisma.user.findUnique({
     where: {
       username: username,
@@ -14,8 +28,17 @@ const register = async (data: FormData) => {
   });
   if (!user) {
     //register the user here
+    await prisma.user.create({
+      data: {
+        username: username,
+        password: sha256(password),
+      },
+    });
+    console.log("user successfully created");
+    redirect("/login");
+  } else {
+    console.log("user already exists with username " + username);
   }
-  console.log(user);
 };
 
 const page = () => {

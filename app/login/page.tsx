@@ -1,7 +1,42 @@
 import React from "react";
+import { prisma } from "@/db";
+import { redirect } from "next/navigation";
+import { sha256 } from "js-sha256";
 
 const login = async (data: FormData) => {
   "use server";
+
+  const username = data.get("username")?.valueOf();
+  const password = data.get("password")?.valueOf();
+
+  if (typeof username !== "string") {
+    throw new Error("Invalid username");
+  }
+
+  if (typeof password !== "string") {
+    throw new Error("Invalid password");
+  }
+
+  if (username.length == 0 || password.length == 0) {
+    return;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      username: username,
+    },
+  });
+
+  if (!user) {
+    throw new Error("user does not exist");
+  }
+  console.log(user);
+  const hash = await user.password;
+  if (sha256(password) == hash) {
+    redirect("/");
+  }
+
+  throw new Error("Incorrect Password");
 };
 
 const page = () => {
@@ -19,7 +54,7 @@ const page = () => {
             </label>
             <input
               type="text"
-              name=""
+              name="username"
               id="usernameInput"
               placeholder="SparklingLemons47"
               className="border-2 rounded-lg shadow-xl px-2 py-1"
@@ -31,7 +66,7 @@ const page = () => {
             </label>
             <input
               type="text"
-              name=""
+              name="password"
               placeholder="123456789"
               id="passwordInput"
               className="border-2 rounded-lg shadow-xl px-2 py-1"
