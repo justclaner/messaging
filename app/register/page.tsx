@@ -2,10 +2,15 @@ import React from "react";
 import { prisma } from "@/db";
 import { sha256 } from "js-sha256";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 const register = async (data: FormData) => {
   "use server";
-
+  // await prisma.room.create({
+  //   data: {
+  //     roomName: "global",
+  //   },
+  // });
   const username = data.get("username")?.valueOf();
   const password = data.get("password")?.valueOf();
 
@@ -82,6 +87,12 @@ const page = () => {
               Register
             </button>
           </div>
+          <h1 className="text-lg">
+            Already have an account?
+            <span className="ml-2 text-blue-300 hover:text-blue-500 active:text-blue-400 duration-75 underline">
+              <Link href="/login">Log In</Link>
+            </span>
+          </h1>
         </div>
       </form>
     </>

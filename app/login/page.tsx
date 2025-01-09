@@ -2,9 +2,14 @@ import React from "react";
 import { prisma } from "@/db";
 import { redirect } from "next/navigation";
 import { sha256 } from "js-sha256";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { ObjectId } from "bson";
 
 const login = async (data: FormData) => {
   "use server";
+
+  const cookie = await cookies();
 
   const username = data.get("username")?.valueOf();
   const password = data.get("password")?.valueOf();
@@ -33,13 +38,17 @@ const login = async (data: FormData) => {
   console.log(user);
   const hash = await user.password;
   if (sha256(password) == hash) {
+    cookie.set("id", user.id);
     redirect("/");
   }
 
   throw new Error("Incorrect Password");
 };
 
-const page = () => {
+const page = async () => {
+  const cookie = await cookies();
+  console.log(cookie.get("id"));
+
   return (
     <>
       <h1 className="text-center text-[48px] font-bold">Messaging App</h1>
@@ -80,6 +89,12 @@ const page = () => {
               Log In
             </button>
           </div>
+          <h1 className="text-lg">
+            New here?
+            <span className="ml-2 text-blue-300 hover:text-blue-500 active:text-blue-400 duration-75 underline">
+              <Link href="/register">Register</Link>
+            </span>
+          </h1>
         </div>
       </form>
     </>

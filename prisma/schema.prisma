@@ -21,6 +21,7 @@ model User {
   receivedMessages Message[] @relation(name: "receivedMessages")
   roomIds          String[]  @db.ObjectId
   rooms            Room[]    @relation(fields: [roomIds], references: [id])
+  friends          Friend[]
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }
@@ -38,7 +39,14 @@ model Message {
 
 model Room {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  roomName    String
   userIds     String[]  @db.ObjectId
   users       User[]    @relation(fields: [userIds], references: [id])
   messageList Message[]
+}
+
+model Friend {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  friendId String @db.ObjectId
+  friend   User   @relation(fields: [friendId], references: [id])
 }
