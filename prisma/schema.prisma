@@ -14,16 +14,18 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  username         String    @unique
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  username         String          @unique
   password         String
-  sentMessages     Message[] @relation(name: "sentMessages")
-  receivedMessages Message[] @relation(name: "receivedMessages")
-  roomIds          String[]  @db.ObjectId
-  rooms            Room[]    @relation(fields: [roomIds], references: [id])
+  sentMessages     Message[]       @relation(name: "sentMessages")
+  receivedMessages Message[]       @relation(name: "receivedMessages")
+  sentRequests     FriendRequest[] @relation(name: "sentRequests")
+  receivedRequests FriendRequest[] @relation(name: "receivedRequests")
+  roomIds          String[]        @db.ObjectId
+  rooms            Room[]          @relation(fields: [roomIds], references: [id])
   friends          Friend[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 model Message {
@@ -49,4 +51,12 @@ model Friend {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   friendId String @db.ObjectId
   friend   User   @relation(fields: [friendId], references: [id])
+}
+
+model FriendRequest {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  senderId    String @db.ObjectId
+  recipientId String @db.ObjectId
+  sender      User   @relation(name: "sentRequests", fields: [senderId], references: [id])
+  recipient   User   @relation(name: "receivedRequests", fields: [senderId], references: [id])
 }

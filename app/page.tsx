@@ -1,8 +1,9 @@
-"use server";
 import React from "react";
 import { prisma } from "@/db";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+
+let currUser: any;
 
 const checkAuthenticated = async () => {
   const cookie = await cookies();
@@ -11,15 +12,22 @@ const checkAuthenticated = async () => {
   if (userId == undefined) {
     redirect("/login");
   } else {
-    const user = await prisma.user.findUnique({
+    currUser = await prisma.user.findUnique({
       where: {
         id: userId.value,
       },
     });
-    if (!user) {
+    if (!currUser) {
       redirect("/login");
     }
   }
+};
+
+const logOut = async () => {
+  "use server";
+  const cookie = await cookies();
+  cookie.delete("id");
+  redirect("/login");
 };
 
 const getUsers = () => {
@@ -31,14 +39,34 @@ const Home = async () => {
   const users = await getUsers();
   return (
     <>
-      <div className="bg-blue-400 p-4 flex justify-left">
-        <h1 className=" mx-2 text-3xl">Messaging App</h1>
+      <div className="bg-blue-400 p-4 flex justify-between items-center">
+        <div className="flex flex-col justify-left mx-2">
+          <h1 className="text-3xl">Messaging App</h1>
+          <h1 className="text-xl">Logged in as {currUser.username}</h1>
+        </div>
+        <form action={logOut}>
+          <input type="text" className="hidden" />
+          <button
+            type="submit"
+            className="px-4 py-1 border-black border-2 rounded-lg bg-neutral-200 hover:bg-neutral-400 active:bg-neutral-300 duration-75"
+          >
+            Log Out
+          </button>
+        </form>
       </div>
-      <div className="absolute p-4 bg-white w-[10%] left-0 flex flex-col max-h-[200px] overflow-auto">
-        <h1 className="text-2xl text-center">Users</h1>
-        {users.map((user) => (
-          <h1 className="text-xl">{user.username}</h1>
-        ))}
+      <div className="absolute bg-white w-[10%] left-0 flex flex-col max-h-[200px]">
+        <h1 className="text-2xl text-center border-2 border-black">Users</h1>
+        <div className="ml-3 overflow-auto">
+          {users.map((user) => {
+            if (user.id !== currUser.id) {
+              return (
+                <h1 className="text-xl" key={user.username}>
+                  {user.username}
+                </h1>
+              );
+            }
+          })}
+        </div>
       </div>
     </>
   );
