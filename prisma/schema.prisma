@@ -55,8 +55,8 @@ model Friend {
 
 model FriendRequest {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
-  senderId    String @db.ObjectId
-  recipientId String @db.ObjectId
+  senderId    String @unique @db.ObjectId
+  recipientId String @unique @db.ObjectId
   sender      User   @relation(name: "sentRequests", fields: [senderId], references: [id])
   recipient   User   @relation(name: "receivedRequests", fields: [senderId], references: [id])
 }
