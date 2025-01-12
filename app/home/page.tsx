@@ -40,6 +40,37 @@ const logOut = async () => {
   redirect("/login");
 };
 
+const getFriendRequest = async (recipientId: string) => {
+  "use server";
+  const request = await prisma.friendRequest.findFirst({
+    where: {
+      senderId: currUser.id,
+      recipientId: recipientId,
+    },
+  });
+  return request;
+};
+
+const sendFriendRequest = async (recipientId: string) => {
+  "use server";
+  const sentRequest = await getFriendRequest(recipientId);
+  if (sentRequest == null) {
+    await prisma.friendRequest.create({
+      data: {
+        senderId: currUser.id,
+        recipientId: recipientId,
+      },
+    });
+  } else {
+    await prisma.friendRequest.delete({
+      where: {
+        id: sentRequest.id,
+      },
+    });
+  }
+  revalidatePath("/home");
+};
+
 const getUsers = () => {
   return prisma.user.findMany();
 };
