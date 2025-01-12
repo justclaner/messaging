@@ -38,7 +38,7 @@ const login = async (data: FormData) => {
   const hash = await user.password;
   if (sha256(password) == hash) {
     cookie.set("id", user.id);
-    redirect("/");
+    redirect("/home");
   }
 
   throw new Error("Incorrect Password");
