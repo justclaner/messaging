@@ -5,11 +5,11 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
-  const users = await prisma.user.findMany({
+  const friendRequests = await prisma.friendRequest.findMany({
     include: {
-      receivedRequests: true,
-      sentRequests: true,
+      sender: true,
+      recipient: true,
     },
   });
-  return NextResponse.json(users, { status: 200 });
+  return NextResponse.json(friendRequests, { status: 200 });
 }

@@ -58,5 +58,5 @@ model FriendRequest {
   senderId    String @unique @db.ObjectId
   recipientId String @unique @db.ObjectId
   sender      User   @relation(name: "sentRequests", fields: [senderId], references: [id])
-  recipient   User   @relation(name: "receivedRequests", fields: [senderId], references: [id])
+  recipient   User   @relation(name: "receivedRequests", fields: [recipientId], references: [id])
 }
