@@ -13,3 +13,7 @@ export async function GET(req: NextRequest) {
   });
   return NextResponse.json(users, { status: 200 });
 }
+
+export async function POST(req: NextRequest) {
+  return NextResponse.json("fuck");
+}

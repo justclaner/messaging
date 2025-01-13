@@ -34,7 +34,10 @@ const User = ({ currUser, user }: UserProps) => {
   };
 
   return (
-    <div className="flex justify-between items-center" key={user.username}>
+    <div
+      className="border-b border-black flex justify-between items-center"
+      key={user.username}
+    >
       <h1 className="text-xl">{user.username}</h1>
       <div>
         <button
