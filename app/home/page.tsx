@@ -72,7 +72,12 @@ const sendFriendRequest = async (recipientId: string) => {
 };
 
 const getUsers = () => {
-  return prisma.user.findMany();
+  return prisma.user.findMany({
+    include: {
+      receivedMessages: true,
+      sentRequests: true,
+    },
+  });
 };
 
 const Home = async () => {
@@ -94,7 +99,7 @@ const Home = async () => {
           </button>
         </form>
       </div>
-      <UserList currUser={currUser} />
+      <UserList currUser={currUser} users={users} />
     </>
   );
 };
